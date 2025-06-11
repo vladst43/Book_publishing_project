@@ -111,58 +111,70 @@ $csrf_token = generateCsrfToken();
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+
 <?php include __DIR__ . '/../templates/header.php'; ?>
 
-<h2>Register</h2>
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm mt-4 mb-4">
+            <h2 class="text-center mb-4" style="color:#FFA500;">Sign up</h2>
 
-<?php if (!empty($errors)): ?>
-    <ul style="color:red;">
-        <?php foreach ($errors as $error): ?>
-            <li><?= htmlspecialchars($error) ?></li>
-        <?php endforeach; ?>
-    </ul>
-<?php endif; ?>
+            <?php if (!empty($errors)): ?>
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        <?php foreach ($errors as $error): ?>
+                            <li><?= htmlspecialchars($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
 
-<form method="post" action="register.php" novalidate>
-    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>" />
+            <form method="post" action="register.php" novalidate>
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>" />
 
-    <label>
-        First Name:
-        <input type="text" name="first_name" required minlength="2" maxlength="50"
-               value="<?= htmlspecialchars($_POST['first_name'] ?? '') ?>" />
-    </label><br/>
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" required minlength="2" maxlength="50"
+                        value="<?= htmlspecialchars($_POST['first_name'] ?? '') ?>" />
+                </div>
 
-    <label>
-        Last Name:
-        <input type="text" name="last_name" required minlength="2" maxlength="50"
-               value="<?= htmlspecialchars($_POST['last_name'] ?? '') ?>" />
-    </label><br/>
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" required minlength="2" maxlength="50"
+                        value="<?= htmlspecialchars($_POST['last_name'] ?? '') ?>" />
+                </div>
 
-    <label>
-        Username:
-        <input type="text" name="username" required minlength="3" maxlength="50"
-               value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" />
-    </label><br/>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required minlength="3" maxlength="50"
+                        value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" />
+                </div>
 
-    <label>
-        Email:
-        <input type="email" name="email" required
-               value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" />
-    </label><br/>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required
+                        value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" />
+                </div>
 
-    <label>
-        Password:
-        <input type="password" name="password" required minlength="8" />
-    </label><br/>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required minlength="8" />
+                </div>
 
-    <label>
-        Confirm Password:
-        <input type="password" name="password_confirm" required minlength="8" />
-    </label><br/>
+                <div class="mb-3">
+                    <label for="password_confirm" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" required minlength="8" />
+                </div>
 
-    <button type="submit">Register</button>
-</form>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-warning" style="background-color:#FFA500; color:white;">Sign up</button>
+                </div>
+            </form>
+            <div class="text-center mt-3">
+                <span>Already have an account? <a href="login.php" style="color:#FFA500;">Login</a></span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php include __DIR__ . '/../templates/footer.php'; ?>
-</body>
-</html>

@@ -70,7 +70,9 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
                             'user_id' => $_SESSION['user_id'],
                             'book_id' => $bookId
                         ]);
-                        $success = 'Book added to favorites successfully!';
+                        // Redirect to the same page to refresh $isFavorited
+                        header("Location: book.php?id=" . urlencode($_GET['id']));
+                        exit;
                     } catch (PDOException $e) {
                         $error = 'Failed to add book to favorites. Please try again.';
                     }
@@ -175,18 +177,7 @@ $csrf_token = generateCsrfToken();
     <title>Book Details - Book Publishing</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Якщо вирішите винести стилі, перенесіть це в css/style.css і підключіть: <link rel="stylesheet" href="css/style.css"> -->
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-        }
-        .book-details img {
-            max-width: 300px;
-            height: auto;
-            object-fit: cover;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -219,13 +210,24 @@ $csrf_token = generateCsrfToken();
                             <?php if ($book['series_name']): ?>
                                 <p class="card-text"><strong>Series:</strong> <?php echo htmlspecialchars($book['series_name']); ?></p>
                             <?php endif; ?>
-                            <p class="card-text"><strong>Published:</strong> <?php echo htmlspecialchars($book['publication_date'] ?? 'N/A'); ?></p>
+                            <p class="card-text"><strong>Published:</strong> <?php echo htmlspecialchars($book['publish_year'] ?? 'N/A'); ?></p>
+                            <p class="card-text"><strong>Price:</strong> <?php echo htmlspecialchars($book['price'] !== null ? '$' . number_format($book['price'], 2) : 'N/A'); ?></p>
+                            <p class="card-text"><strong>Stock Quantity:</strong> <?php echo htmlspecialchars($book['stock_quantity'] !== null ? $book['stock_quantity'] : 'N/A'); ?></p>
                             <p class="card-text"><strong>Description:</strong> <?php echo htmlspecialchars($book['description'] ?? 'No description available.'); ?></p>
-                            <form method="post" action="book.php?id=<?php echo htmlspecialchars($_GET['id']); ?>" novalidate>
+                            <form method="post" action="book.php?id=<?php echo htmlspecialchars($_GET['id']); ?>" novalidate style="display:inline-block; margin-right:10px;">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                 <input type="hidden" name="add_to_favorites" value="1">
                                 <button type="submit" class="btn btn-warning" <?php echo $isFavorited ? 'disabled' : ''; ?>>
                                     <i class="fas fa-heart me-2"></i><?php echo $isFavorited ? 'Already in Favorites' : 'Add to Favorites'; ?>
+                                </button>
+                            </form>
+                            <!-- Add to cart -->
+                            <form method="post" action="/add_to_cart.php" style="display:inline-block;">
+                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(getCsrfToken()); ?>">
+                                <input type="hidden" name="book_id" value="<?php echo (int)$book['id']; ?>">
+                                <input type="number" name="qty" value="1" min="1" max="<?php echo (int)($book['stock_quantity'] ?? 99); ?>" style="width:70px; display:inline-block;">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart me-2"></i>Add to cart
                                 </button>
                             </form>
                         </div>
@@ -263,7 +265,6 @@ $csrf_token = generateCsrfToken();
                 </div>
             <?php endif; ?>
 
-            <!-- Bootstrap Modal for Delete Confirmation -->
             <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">

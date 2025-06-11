@@ -41,30 +41,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $csrf_token = generateCsrfToken();
 ?>
 
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Log in</title>
-    <link rel="stylesheet" href="/css/style.css" />
-</head>
-<body>
-    <h1>Log in</h1>
-    <?php if ($errors): ?>
-        <ul style="color:red;">
-            <?php foreach ($errors as $error): ?>
-                <li><?= htmlspecialchars($error) ?></li>
-            <?php endforeach ?>
-        </ul>
-    <?php endif ?>
-    <form method="post" action="/login.php" novalidate>
-        <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>" />
-        <label>Email: <input type="email" name="email" required value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" /></label><br/>
-        <label>Password: <input type="password" name="password" required /></label><br/>
-        <button type="submit">Log in</button>
-    </form>
-    <p>Don't have an account? <a href="/register.php">Sign up</a></p>
-</body>
-</html>
+
+
+<?php include __DIR__ . '/../templates/header.php'; ?>
+<link rel="stylesheet" href="/css/footer-fix.css" />
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+        <div class="card shadow-sm mt-4 mb-4">
+            <h2 class="text-center mb-4" style="color:#FFA500;">Log in</h2>
+
+            <?php if ($errors): ?>
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        <?php foreach ($errors as $error): ?>
+                            <li><?= htmlspecialchars($error) ?></li>
+                        <?php endforeach ?>
+                    </ul>
+                </div>
+            <?php endif ?>
+
+            <form method="post" action="/login.php" novalidate>
+                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>" />
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required />
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-warning" style="background-color:#FFA500; color:white;">Log in</button>
+                </div>
+            </form>
+            <div class="text-center mt-3">
+                <span>Don't have an account? <a href="/register.php" style="color:#FFA500;">Sign up</a></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php include __DIR__ . '/../templates/footer.php'; ?>

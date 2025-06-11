@@ -4,6 +4,7 @@ require_once __DIR__ . '/../helpers/auth.php';
 
 // Get the current page to conditionally display buttons
 $currentPage = basename($_SERVER['PHP_SELF']);
+$isAdminPage = strpos($_SERVER['REQUEST_URI'], '/admin/') === 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,78 +14,57 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <title>Book Publishing Site</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Якщо є кастомні стилі, підключіть їх: -->
     <link rel="stylesheet" href="/css/style.css" />
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-        }
-        .navbar {
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #f97316;
-        }
-        .navbar-brand:hover {
-            color: #ea580c;
-        }
-        .nav-link {
-            color: #333;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-        }
-        .nav-link:hover {
-            color: #f97316;
-        }
-        .nav-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .nav-btn.login, .nav-btn.signup {
-            background-color: #f97316;
-            color: white;
-            border: none;
-        }
-        .nav-btn.login:hover, .nav-btn.signup:hover {
-            background-color: #ea580c;
-        }
-        .nav-btn.logout {
-            background-color: #dc2626;
-            color: white;
-            border: none;
-        }
-        .nav-btn.logout:hover {
-            background-color: #b91c1c;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/footer-fix.css" />
+    
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container">
-                <a class="navbar-brand" href="#">Book Publishing Site</a>
+                <a class="navbar-brand" href="/index.php">Book Publishing Site</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        <?php if ($currentPage !== 'index.php'): ?>
-                            <li class="nav-item">
-                                <a href="/index.php" class="nav-link nav-btn"><i class="fas fa-home me-2"></i>Home</a>
-                            </li>
-                        <?php endif; ?>
+                       
                         <?php if (isLoggedIn() && $currentPage !== 'profile.php'): ?>
                             <li class="nav-item">
                                 <a href="/profile.php" class="nav-link nav-btn"><i class="fas fa-user me-2"></i>Profile</a>
                             </li>
                         <?php endif; ?>
+                        <li class="nav-item">
+                            <a href="/cart.php" class="nav-link nav-btn">
+                                <i class="fas fa-shopping-cart me-2"></i>Cart
+                            </a>
+                        </li>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'accountant'): ?>
+                            <li class="nav-item">
+                                <a href="/accountant/index.php" class="nav-link nav-btn" style="background:#FFA500; color:#fff;">
+                                    <i class="fas fa-calculator me-2"></i>Accountant Panel
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin' && !$isAdminPage): ?>
+                            <li class="nav-item">
+                                <a href="/admin/index.php" class="nav-link nav-btn" style="background:#FFA500; color:#fff;">
+                                    <i class="fas fa-tools me-2"></i>Admin panel
+                                </a>
+                            </li>
+                        <?php endif; ?>
                     </ul>
+                    <!-- Менеджерська панель -->
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'manager'): ?>
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a href="/manager/index.php" class="nav-link nav-btn">Склад</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/manager/report.php" class="nav-link nav-btn">Звітність</a>
+                            </li>
+                        </ul>
+                    <?php endif; ?>
                     <ul class="navbar-nav">
                         <?php if (isLoggedIn()): ?>
                             <li class="nav-item">

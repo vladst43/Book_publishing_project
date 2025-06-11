@@ -10,7 +10,8 @@ use Hashids\Hashids;
 
 requireLogin(); 
 
-$hashids = new Hashids('your salt here', 10);
+$config = require __DIR__ . '/../config/config.php';
+$hashids = new Hashids($config['hashids_salt'], 10);
 $userId = $_SESSION['user_id'];
 
 $stmt = $pdo->prepare("
@@ -47,40 +48,51 @@ $favorites = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - Book Publishing</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <?php include __DIR__ . '/../templates/header.php'; ?>
 
-<h1>User Profile</h1>
-
-<div class="profile-details">
-    <h2>Account Information</h2>
-    <p><strong>First Name:</strong> <?= htmlspecialchars($user['first_name']) ?></p>
-    <p><strong>Last Name:</strong> <?= htmlspecialchars($user['last_name']) ?></p>
-    <p><strong>Username:</strong> <?= htmlspecialchars($user['username']) ?></p>
-    <p><strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
-    <p><strong>Role:</strong> <?= htmlspecialchars($user['role']) ?></p>
-</div>
-
-<h2>Favorite Books</h2>
-<?php if (empty($favorites)): ?>
-    <p>No favorite books yet.</p>
-<?php else: ?>
-    <div class="book-carousel">
-        <?php foreach ($favorites as $book): ?>
-            <?php $encodedId = $hashids->encode($book['id']); ?>
-            <div class="book-card">
-                <a href="book.php?id=<?= htmlspecialchars($encodedId) ?>">
-                    <img src="<?= htmlspecialchars($book['cover_image'] ?? 'images/default_cover.jpg') ?>" alt="Cover of <?= htmlspecialchars($book['title']) ?>">
-                    <div class="book-title"><?= htmlspecialchars($book['title']) ?></div>
-                    <div class="book-author"><?= htmlspecialchars($book['author_name']) ?></div>
-                </a>
+<div class="container">
+    <section class="profile-section">
+        <h1>User Profile</h1>
+        <div class="profile-card">
+                <div class="profile-info">
+                <h2>Account Information</h2>
+                <p><i class="fas fa-user"></i> <strong>First Name:</strong> <?= htmlspecialchars($user['first_name']) ?></p>
+                <p><i class="fas fa-user"></i> <strong>Last Name:</strong> <?= htmlspecialchars($user['last_name']) ?></p>
+                <p><i class="fas fa-user-circle"></i> <strong>Username:</strong> <?= htmlspecialchars($user['username']) ?></p>
+                <p><i class="fas fa-envelope"></i> <strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
+                <p><i class="fas fa-user-tag"></i> <strong>Role:</strong> <?= htmlspecialchars($user['role']) ?></p>
             </div>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
+            <!-- <div class="profile-actions">
+                <button class="btn-edit">Edit Profile</button>
+            </div> -->
+        </div>
+    </section>
+
+    <section class="favorites-section">
+        <h2>Favorite Books</h2>
+        <?php if (empty($favorites)): ?>
+            <p>No favorite books yet.</p>
+        <?php else: ?>
+            <div class="book-carousel">
+                <?php foreach ($favorites as $book): ?>
+                    <?php $encodedId = $hashids->encode($book['id']); ?>
+                    <div class="book-card">
+                        <a href="book.php?id=<?= htmlspecialchars($encodedId) ?>">
+                            <img src="<?= htmlspecialchars($book['cover_image'] ?? 'images/default_cover.jpg') ?>" alt="Cover of <?= htmlspecialchars($book['title']) ?>">
+                            <div class="book-title"><?= htmlspecialchars($book['title']) ?></div>
+                            <div class="book-author"><?= htmlspecialchars($book['author_name']) ?></div>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </section>
+</div>
 
 <?php include __DIR__ . '/../templates/footer.php'; ?>
 </body>

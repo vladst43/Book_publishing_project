@@ -34,11 +34,34 @@ function isAdmin() {
     return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 }
 
+function isManager() {
+    return isset($_SESSION['role']) && $_SESSION['role'] === 'manager';
+}
+
+function requireManager() {
+    requireLogin();
+    if (!isManager()) {
+        header('HTTP/1.1 403 Forbidden');
+        exit('Forbidden');
+    }
+}
+
 function requireAdmin() {
     requireLogin();
     if (!isAdmin()) {
         header('HTTP/1.1 403 Forbidden');
         exit('Forbidden');
+    }
+}
+
+function isAccountant() {
+    return isset($_SESSION['role']) && $_SESSION['role'] === 'accountant';
+}
+
+function requireAccountant() {
+    if (!isAccountant()) {
+        header('Location: /login.php');
+        exit;
     }
 }
 
