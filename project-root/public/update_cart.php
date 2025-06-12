@@ -2,7 +2,6 @@
 require_once __DIR__ . '/../helpers/cart.php';
 require_once __DIR__ . '/../helpers/csrf.php';
 
-// Перевірка POST-запиту та CSRF
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_id'], $_POST['qty'], $_POST['csrf_token'])) {
     if (!verifyCsrfToken($_POST['csrf_token'])) {
         http_response_code(403);

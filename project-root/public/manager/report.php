@@ -5,7 +5,6 @@ requireManager();
 require_once '../../config/db.php';
 require_once '../../templates/header.php';
 
-// Get all books with stock
 $stmt = $pdo->query("SELECT b.title, CONCAT(a.first_name, ' ', a.last_name) AS author, c.name AS category, b.stock_quantity
     FROM books b
     LEFT JOIN authors a ON b.author_id = a.id
@@ -62,7 +61,8 @@ function copyTableToClipboard() {
 }
 </script>
 <?php
-// CSV export
+
+
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename=stock_report.csv');

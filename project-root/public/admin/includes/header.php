@@ -1,5 +1,4 @@
 <?php
-// public/admin/includes/header.php
 require_once __DIR__ . '/../../../helpers/auth.php';
 
 if (session_status() === PHP_SESSION_NONE) {

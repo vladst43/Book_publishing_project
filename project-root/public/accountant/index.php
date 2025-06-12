@@ -2,17 +2,14 @@
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/../../helpers/auth.php';
 
-// Only accountants can access
 requireAccountant();
 
-// Fetch orders and stats
 $orders = [];
 $totalSales = 0;
 $totalOrders = 0;
 $topBooks = [];
 
 
-// --- FILTERS ---
 $where = [];
 $params = [];
 if (!empty($_GET['user'])) {
@@ -38,13 +35,11 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $orders = $stmt->fetchAll();
 
-// Get stats
 $stmt = $pdo->query("SELECT COUNT(*) as cnt, SUM(total_price) as sum FROM orders");
 $stats = $stmt->fetch();
 $totalOrders = $stats['cnt'] ?? 0;
 $totalSales = $stats['sum'] ?? 0;
 
-// Top books
 $stmt = $pdo->query("SELECT b.title, SUM(oi.quantity) as sold FROM order_items oi JOIN books b ON oi.book_id = b.id GROUP BY oi.book_id ORDER BY sold DESC LIMIT 5");
 $topBooks = $stmt->fetchAll();
 
@@ -85,7 +80,7 @@ include __DIR__ . '/../../templates/header.php';
     <div class="card shadow-sm">
         <div class="card-body">
             <h4 class="card-title mb-3">Orders</h4>
-            <!-- Filter form -->
+
             <form class="row g-2 mb-4" method="get" action="">
                 <div class="col-md-2">
                     <input type="text" name="user" class="form-control" placeholder="User" value="<?= htmlspecialchars($_GET['user'] ?? '') ?>">

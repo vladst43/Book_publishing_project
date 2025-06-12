@@ -1,8 +1,6 @@
 <?php
-// templates/header.php
 require_once __DIR__ . '/../helpers/auth.php';
 
-// Get the current page to conditionally display buttons
 $currentPage = basename($_SERVER['PHP_SELF']);
 $isAdminPage = strpos($_SERVER['REQUEST_URI'], '/admin/') === 0;
 ?>
@@ -54,14 +52,14 @@ $isAdminPage = strpos($_SERVER['REQUEST_URI'], '/admin/') === 0;
                             </li>
                         <?php endif; ?>
                     </ul>
-                    <!-- Менеджерська панель -->
+
                     <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'manager'): ?>
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item">
-                                <a href="/manager/index.php" class="nav-link nav-btn">Склад</a>
+                                <a href="/manager/index.php" class="nav-link nav-btn">Store</a>
                             </li>
                             <li class="nav-item">
-                                <a href="/manager/report.php" class="nav-link nav-btn">Звітність</a>
+                                <a href="/manager/report.php" class="nav-link nav-btn">Reports</a>
                             </li>
                         </ul>
                     <?php endif; ?>

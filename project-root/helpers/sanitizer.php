@@ -17,9 +17,9 @@ function sanitizeEmail(string $email): string {
 }
 
 function sanitizeReviewText($input) {
-    // Видаляємо HTML-теги, залишаючи апострофи та інші безпечні символи
+
     $sanitized = strip_tags($input);
-    // Обрізаємо пробіли
+
     $sanitized = trim($sanitized);
     return $sanitized;
 }

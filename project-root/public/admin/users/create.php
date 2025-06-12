@@ -24,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password === '' || strlen($password) < 6) $errors[] = "Password (min 6 chars) is required.";
     if (!in_array($role, ['admin','user','manager','accountant'])) $errors[] = "Invalid role.";
 
-    // Check unique username/email
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
     $stmt->execute([$username, $email]);
     if ($stmt->fetchColumn() > 0) $errors[] = "Username or email already exists.";

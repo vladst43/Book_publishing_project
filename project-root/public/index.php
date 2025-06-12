@@ -1,5 +1,4 @@
 <?php
-// public/index.php
 require_once __DIR__ . '/../helpers/init.php';
 require_once __DIR__ . '/../config/db.php';
 $config = require_once __DIR__ . '/../config/config.php';
@@ -15,40 +14,35 @@ $error = '';
 $search_raw = $_GET['search'] ?? '';
 $search = trim(sanitizeString($search_raw));
 
-// Валідація пошукового терміну
+
 if ($search !== '') {
-    // Обмеження довжини
     if (mb_strlen($search) > 100) {
         $error = 'Search term must not exceed 100 characters.';
         $search = mb_substr($search, 0, 100);
     }
-    // Мінімальна довжина
     elseif (mb_strlen($search) < 2) {
         $error = 'Search term must be at least 2 characters long.';
         $search = '';
     }
-    // Дозволені символи
     elseif (!preg_match('/^[\p{L}\p{N}\s\-\.,\'’]+$/u', $search)) {
         $error = 'Please use letters, numbers, spaces, hyphens, dots, commas, or apostrophes.';
         $search = '';
     }
 } elseif (!empty($_GET['search'])) {
-    // Порожній пошук після trim
     $error = 'Please enter a search term.';
     $search = '';
 }
 
-// Pagination
 $page = filter_var($_GET['page'] ?? 1, FILTER_SANITIZE_NUMBER_INT);
 $page = max(1, $page);
-$perPage = 50;
+$perPage = 15;
 $offset = ($page - 1) * $perPage;
 
-// Filters
+
 $category = $_GET['category'] ?? '';
 $author = $_GET['author'] ?? '';
 
-// Підрахунок загальної кількості книг або результатів пошуку
+
 $totalBooks = 0;
 if ($search !== '') {
     try {
@@ -78,7 +72,6 @@ if ($search !== '') {
 }
 $totalPages = max(1, ceil($totalBooks / $perPage));
 
-// Популярні книги (без пошуку)
 $popular_books = [];
 if ($search === '') {
     try {
@@ -101,7 +94,7 @@ if ($search === '') {
     }
 }
 
-// Усі книги або результати пошуку
+
 $all_books = [];
 try {
     $where = [];
@@ -193,7 +186,7 @@ try {
     </div>
 
     <?php
-    // Get categories and authors for filter dropdowns
+
     $categoriesList = $pdo->query("SELECT id, name FROM categories ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
     $authorsList = $pdo->query("SELECT id, CONCAT(first_name, ' ', last_name) AS name FROM authors ORDER BY first_name, last_name")->fetchAll(PDO::FETCH_ASSOC);
     ?>

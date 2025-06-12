@@ -27,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
     } elseif (!$cart) {
         $flash = 'Your cart is empty.';
     } else {
-        // 1. Check stock for all items before placing order
         $insufficientStock = [];
         foreach ($cart as $bookId => $qty) {
             if (!isset($books[$bookId]) || $books[$bookId]['stock_quantity'] < $qty) {
@@ -37,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
         if (!empty($insufficientStock)) {
             $flash = 'Not enough stock for: ' . htmlspecialchars(implode(', ', $insufficientStock));
         } else {
-            // 2. Place order and decrease stock atomically
+
             $pdo->beginTransaction();
             try {
                 $stmt = $pdo->prepare("INSERT INTO orders (user_id, total_price, status) VALUES (?, ?, 'pending')");
@@ -73,7 +72,7 @@ include __DIR__ . '/../templates/header.php';
     <?php if (!$cart): ?>
         <p>Your cart is empty.</p>
     <?php else: ?>
-        <!-- Stock warning (client-side, UX improvement) -->
+
         <?php $hasStockWarning = false; ?>
         <?php foreach ($cart as $bookId => $qty): ?>
             <?php if (isset($books[$bookId]) && $books[$bookId]['stock_quantity'] < $qty): ?>

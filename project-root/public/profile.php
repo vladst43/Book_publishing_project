@@ -67,9 +67,8 @@ $favorites = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <p><i class="fas fa-envelope"></i> <strong>Email:</strong> <?= htmlspecialchars($user['email']) ?></p>
                 <p><i class="fas fa-user-tag"></i> <strong>Role:</strong> <?= htmlspecialchars($user['role']) ?></p>
             </div>
-            <!-- <div class="profile-actions">
-                <button class="btn-edit">Edit Profile</button>
-            </div> -->
+            
+            
         </div>
     </section>
 

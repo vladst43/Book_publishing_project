@@ -1,11 +1,9 @@
 <?php
-// Функції для роботи з корзиною (зберігання у сесії)
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Add item to cart (DB persistent for logged-in users)
 function addToCart($bookId, $qty = 1) {
     require_once __DIR__ . '/../config/db.php';
     $bookId = (int)$bookId;
@@ -13,7 +11,7 @@ function addToCart($bookId, $qty = 1) {
     if ($bookId < 1 || $qty < 1) return;
     if (isset($_SESSION['user_id'])) {
         $userId = $_SESSION['user_id'];
-        // Find or create cart
+
         $stmt = $pdo->prepare("SELECT id FROM carts WHERE user_id = ?");
         $stmt->execute([$userId]);
         $cartId = $stmt->fetchColumn();
@@ -21,7 +19,7 @@ function addToCart($bookId, $qty = 1) {
             $pdo->prepare("INSERT INTO carts (user_id) VALUES (?)")->execute([$userId]);
             $cartId = $pdo->lastInsertId();
         }
-        // Add or update item
+
         $stmt = $pdo->prepare("SELECT id, quantity FROM cart_items WHERE cart_id = ? AND book_id = ?");
         $stmt->execute([$cartId, $bookId]);
         $item = $stmt->fetch();
@@ -32,7 +30,7 @@ function addToCart($bookId, $qty = 1) {
             $pdo->prepare("INSERT INTO cart_items (cart_id, book_id, quantity) VALUES (?, ?, ?)")->execute([$cartId, $bookId, $qty]);
         }
     } else {
-        // Fallback to session for guests
+
         if (!isset($_SESSION['cart'])) {
             $_SESSION['cart'] = [];
         }
@@ -44,7 +42,7 @@ function addToCart($bookId, $qty = 1) {
     }
 }
 
-// Update item quantity in cart
+
 function updateCart($bookId, $qty) {
     require_once __DIR__ . '/../config/db.php';
     $bookId = (int)$bookId;
@@ -76,7 +74,7 @@ function updateCart($bookId, $qty) {
     }
 }
 
-// Remove item from cart
+
 function removeFromCart($bookId) {
     require_once __DIR__ . '/../config/db.php';
     $bookId = (int)$bookId;
@@ -95,7 +93,7 @@ function removeFromCart($bookId) {
     }
 }
 
-// Get all items from cart
+
 function getCartItems() {
     global $pdo;
     if (!isset($pdo)) {
@@ -120,12 +118,11 @@ function getCartItems() {
     }
 }
 
-// Порахувати загальну кількість товарів у корзині
 function getCartCount() {
     return array_sum(getCartItems());
 }
 
-// Clear cart
+
 function clearCart() {
     global $pdo;
     if (!isset($pdo)) {
@@ -144,7 +141,7 @@ function clearCart() {
     }
 }
 
-// Порахувати загальну суму (потрібно передати масив книг з цінами)
+
 function getCartTotal($books) {
     $cart = getCartItems();
     $total = 0;

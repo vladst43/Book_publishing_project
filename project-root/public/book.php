@@ -1,5 +1,4 @@
 <?php
-// public/book.php
 require_once __DIR__ . '/../helpers/init.php';
 require_once __DIR__ . '/../config/db.php';
 $config = require_once __DIR__ . '/../config/config.php';
@@ -11,7 +10,7 @@ require_once __DIR__ . '/../helpers/csrf.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 use Hashids\Hashids;
 
-requireLogin(); // Redirect to login if not authenticated
+requireLogin();
 
 $hashids = new Hashids($config['hashids_salt'], 10);
 $error = '';
@@ -42,7 +41,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
         if (!$book) {
             $error = 'Book not found.';
         } else {
-            // Check if book is already in favorites
+            
             $stmt = $pdo->prepare("
                 SELECT id FROM favorites 
                 WHERE user_id = :user_id AND book_id = :book_id
@@ -54,7 +53,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
             ]);
             $isFavorited = $stmt->fetch() !== false;
 
-            // Handle "Add to Favorites" form submission
+            
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_favorites'])) {
                 if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                     $error = 'Invalid CSRF token.';
@@ -70,7 +69,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
                             'user_id' => $_SESSION['user_id'],
                             'book_id' => $bookId
                         ]);
-                        // Redirect to the same page to refresh $isFavorited
+                        
                         header("Location: book.php?id=" . urlencode($_GET['id']));
                         exit;
                     } catch (PDOException $e) {
@@ -79,7 +78,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
                 }
             }
 
-            // Handle review submission
+            
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
                 if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                     $error = 'Invalid CSRF token.';
@@ -111,7 +110,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
                 }
             }
 
-            // Handle review deletion
+            
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_review'])) {
                 if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                     $error = 'Invalid CSRF token.';
@@ -120,39 +119,42 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
                     if ($reviewId === false || $reviewId <= 0) {
                         $error = 'Invalid review ID.';
                     } else {
-                        // Verify the review belongs to the current user and book
-                        $stmt = $pdo->prepare("
-                            SELECT id FROM reviews
-                            WHERE id = :review_id AND user_id = :user_id AND book_id = :book_id
-                            LIMIT 1
-                        ");
-                        $stmt->execute([
+                        $canDeleteAny = isAdmin();
+                        $sql = $canDeleteAny
+                            ? "SELECT id FROM reviews WHERE id = :review_id AND book_id = :book_id LIMIT 1"
+                            : "SELECT id FROM reviews WHERE id = :review_id AND user_id = :user_id AND book_id = :book_id LIMIT 1";
+                        $params = [
                             'review_id' => $reviewId,
-                            'user_id' => $_SESSION['user_id'],
                             'book_id' => $bookId
-                        ]);
+                        ];
+                        if (!$canDeleteAny) {
+                            $params['user_id'] = $_SESSION['user_id'];
+                        }
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute($params);
                         if ($stmt->fetch()) {
-                            $stmt = $pdo->prepare("
-                                DELETE FROM reviews
-                                WHERE id = :review_id AND user_id = :user_id
-                            ");
+                            $deleteSql = $canDeleteAny
+                                ? "DELETE FROM reviews WHERE id = :review_id"
+                                : "DELETE FROM reviews WHERE id = :review_id AND user_id = :user_id";
+                            $deleteParams = ['review_id' => $reviewId];
+                            if (!$canDeleteAny) {
+                                $deleteParams['user_id'] = $_SESSION['user_id'];
+                            }
                             try {
-                                $stmt->execute([
-                                    'review_id' => $reviewId,
-                                    'user_id' => $_SESSION['user_id']
-                                ]);
+                                $stmt = $pdo->prepare($deleteSql);
+                                $stmt->execute($deleteParams);
                                 $success = 'Review deleted successfully!';
                             } catch (PDOException $e) {
                                 $error = 'Failed to delete review. Please try again.';
                             }
                         } else {
-                            $error = 'You can only delete your own reviews.';
+                            $error = $canDeleteAny ? 'Review not found.' : 'You can only delete your own reviews.';
                         }
                     }
                 }
             }
 
-            // Fetch reviews for this book
+            
             $stmt = $pdo->prepare("
                 SELECT r.id, r.review_text, r.created_at, u.username, r.user_id
                 FROM reviews r
@@ -221,7 +223,7 @@ $csrf_token = generateCsrfToken();
                                     <i class="fas fa-heart me-2"></i><?php echo $isFavorited ? 'Already in Favorites' : 'Add to Favorites'; ?>
                                 </button>
                             </form>
-                            <!-- Add to cart -->
+
                             <form method="post" action="/add_to_cart.php" style="display:inline-block;">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(getCsrfToken()); ?>">
                                 <input type="hidden" name="book_id" value="<?php echo (int)$book['id']; ?>">
@@ -254,7 +256,7 @@ $csrf_token = generateCsrfToken();
                             <div class="card-body">
                                 <p class="card-text"><strong><?php echo htmlspecialchars($review['username']); ?></strong> on <?php echo htmlspecialchars($review['created_at']); ?>:</p>
                                 <p class="card-text"><?php echo htmlspecialchars($review['review_text']); ?></p>
-                                <?php if ($review['user_id'] === $_SESSION['user_id']): ?>
+                                <?php if ($review['user_id'] === $_SESSION['user_id'] || (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')): ?>
                                     <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" onclick="setReviewId(<?php echo htmlspecialchars($review['id']); ?>)">
                                         <i class="fas fa-trash-alt me-2"></i>Delete Review
                                     </button>

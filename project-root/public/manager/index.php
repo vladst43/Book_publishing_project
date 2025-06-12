@@ -6,7 +6,6 @@ require_once '../../config/db.php';
 require_once '../../templates/header.php';
 
 
-// Filters
 $category = $_GET['category'] ?? '';
 $author = $_GET['author'] ?? '';
 $status = $_GET['status'] ?? '';
@@ -40,7 +39,6 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $categories = $pdo->query("SELECT id, name FROM categories ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 $authors = $pdo->query("SELECT id, CONCAT(first_name, ' ', last_name) AS name FROM authors ORDER BY first_name, last_name")->fetchAll(PDO::FETCH_ASSOC);
 
-// Low stock threshold
 $lowStockThreshold = 10;
 ?>
 <div class="container mt-4">

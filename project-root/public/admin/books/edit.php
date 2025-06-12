@@ -55,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$author_id) $errors[] = "Author is required.";
     if (!$category_id) $errors[] = "Category is required.";
 
-    // Cover image upload
     if (!empty($_FILES['cover']['name'])) {
         $ext = strtolower(pathinfo($_FILES['cover']['name'], PATHINFO_EXTENSION));
         $allowed = ['jpg', 'jpeg', 'png', 'webp'];

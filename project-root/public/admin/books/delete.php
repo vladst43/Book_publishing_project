@@ -20,9 +20,7 @@ if (!$book) {
     exit;
 }
 
-// Видалення книги після підтвердження
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Видалити обкладинку з диска, якщо є
     if (!empty($book['cover_image']) && file_exists(__DIR__ . '/../../../public/' . $book['cover_image'])) {
         unlink(__DIR__ . '/../../../public/' . $book['cover_image']);
     }

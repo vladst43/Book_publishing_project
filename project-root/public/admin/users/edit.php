@@ -38,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Valid email is required.";
     if (!in_array($role, ['admin','user','manager','accountant'])) $errors[] = "Invalid role.";
 
-    // Check unique username/email (exclude current user)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
     $stmt->execute([$username, $email, $id]);
     if ($stmt->fetchColumn() > 0) $errors[] = "Username or email already exists.";

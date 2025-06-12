@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../helpers/auth.php';
 
 requireAccountant();
 
-// --- FILTERS (same as index.php) ---
 $where = [];
 $params = [];
 if (!empty($_GET['user'])) {
